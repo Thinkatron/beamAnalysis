@@ -7,6 +7,7 @@ int main(int argc, char* argv[]) {
     
     svr.get("/*", [](const Request& req, Response& res) {
         string path = req.path;
+        if (path.length() > 0) path = path.substr(1, path.length());
         cout << "Old path:\t" << path << "\n";
         if (path == "") path = "index.html";
         cout << "New path:\t" << path << "\n";
