@@ -18,7 +18,7 @@ function renderPanel(panelObj) {
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(panelObj.xSize, panelObj.ySize, 0.1, 2000 );
     var renderer = new THREE.WebGLRenderer( { alpha: true, antialias: true } );
-    (renderer.domElement)
+    
 
     renderer.setSize( window.innerWidth, (window.innerHeight) );
     document.body.appendChild( renderer.domElement );
@@ -39,17 +39,22 @@ function renderPanel(panelObj) {
     scene.add(cube);
     scene.add(bounds);
     camera.position.z = 10;
-
+    //camera.rotate.z = 90;
+    //scene.position.y = 2;
+    renderer.render(scene, camera);
+    panels[panels.length] = renderer.domElement;
 }
-//camera.rotate.z = 90;
-//scene.position.y = 2;
 
 
+renderPanel(new panel([]));
 
+
+var ctx = (document.getElementById("mainCanvas")).getContext("2d");
 var animate = function () {
     requestAnimationFrame( animate );
-//renderer.setSize( window.innerWidth, (window.innerHeight/5) );
-    //renderer.render(scene, camera);
+    for(var i = 1; i < panels.length; i++) {
+        ctx.drawImage();
+    }
 };
 
 animate();
