@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 const THREE = require("./three.min.js");
 const fs = require('fs');
 const readline = require('readline');
@@ -14,6 +14,11 @@ var total = 0;
 
 createMatrix();
 
+var loadingDiv = document.getElementById('loading');
+
+var updateLoading = setInterval(function() {
+    
+})
 
 function createMatrix() {
     dataMatrix = new Array(xS);
@@ -47,7 +52,7 @@ function createMatrix() {
 
 
 function init() {
-    camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 5, 3500 );
+    camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 5, 3500 );
     
     camera.position.z = 2750;
     const avg = total / (xS * yS);
@@ -109,7 +114,7 @@ function init() {
     controls.dampingFactor = 0.25;
     controls.enableZoom = false;
 
-    document.body.removeChild( document.getElementById("loading"));
+    document.body.removeChild( loadingDiv );
     document.body.appendChild( renderer.domElement );
 
     //
