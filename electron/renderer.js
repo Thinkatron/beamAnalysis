@@ -4,8 +4,6 @@ const fs = require('fs');
 const readline = require('readline');
 const OrbitControls = require("three-orbitcontrols");
 
-const remote = require('remote');
-
 var container, stats, controls, camera, scene, renderer, dataMatrix;
 const xS = 721;
 const yS = 1313;
