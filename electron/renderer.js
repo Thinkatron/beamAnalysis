@@ -30,7 +30,7 @@ function createMatrix() {
             const luminosity = k[3];
             dataMatrix[x][y] += (luminosity >= 200);
             maxCount = Math.max(dataMatrix[x][y], maxCount);
-            var center = 0.5 * maxCount
+            var center = 0.5 * maxCount;
             total++;
         }
         //setTimeout(rl.resume, 0);
@@ -109,6 +109,7 @@ function init() {
     controls.dampingFactor = 0.25;
     controls.enableZoom = false;
 
+    document.body.removeChild( document.getElementById("loading"));
     document.body.appendChild( renderer.domElement );
 
     //
