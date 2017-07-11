@@ -16,9 +16,16 @@ createMatrix();
 
 var loadingDiv = document.getElementById('loading');
 
+var numDots = 0;
+
 var updateLoading = setInterval(function() {
-    
-})
+  loadingDiv.innerHTML += '.';
+  numDots ++;
+  if(numDots == 4){
+    loadingDiv.innerHTML = "LOADING";
+    numDots = 0;
+  }
+}, 200);
 
 function createMatrix() {
     dataMatrix = new Array(xS);
@@ -54,7 +61,7 @@ function createMatrix() {
 function init() {
 
     camera = new THREE.PerspectiveCamera( 40, window.innerWidth / window.innerHeight, 5, 3500 );
-    
+
     camera.position.z = 2750;
     const avg = total / (xS * yS);
     scene = new THREE.Scene();
@@ -115,7 +122,8 @@ function init() {
     controls.dampingFactor = 0.25;
     controls.enableZoom = false;
 
-    document.body.removeChild( loadingDiv );
+    document.body.removeChild( document.getElementById('loading-container') );
+    clearInterval(updateLoading);
     document.body.appendChild( renderer.domElement );
 
     //
