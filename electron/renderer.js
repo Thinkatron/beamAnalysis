@@ -4,11 +4,10 @@ const fs = require('fs');
 const readline = require('readline');
 const OrbitControls = require("three-orbitcontrols");
 
-var container, stats, controls, camera, scene, renderer, dataMatrix;
+var container, stats, controls, camera, scene, renderer, dataMatrix, points;
 const xS = 721;
 const yS = 1313;
 const Height = 2;
-var points;
 var maxCount = 0;
 var total = 0;
 
@@ -20,12 +19,16 @@ var updateLoading = setInterval(function() {
     
 })
 
+function findCol(x) {
+    return (-2 / (1 + (Math.pow(Math.E, -4 * Math.abs(x)))))+2;
+}
+
 function createMatrix() {
     dataMatrix = new Array(xS);
     for(var i = 0; i < xS; i++){
         dataMatrix[i] = new Array(yS).fill(0);
     }
-    var rl = readline.createInterface({ input: fs.createReadStream("exData.TXT") });
+    var rl = readline.createInterface({ input: fs.createReadStream("../exFiles/132_alpha0p5mmhole.TXT") });
     rl.on('line', function(line) {
         var k = line.split("\t");
         //rl.pause();
@@ -69,7 +72,9 @@ function init() {
     var color = new THREE.Color();
 
     var n = 1000, n2 = n / 2; // particles spread in the cube
-
+    var sumDifSqr = 0;
+    for ( var x = 0; x < xS; x++) { for (var y = 0; y < 1313; y++) {sumDifSqr += Math.pow((dataMatrix[x][y] - avg), 2)}}; // Summation of absolute deviations squared
+    var stDev = Math.sqrt(sumDifSqr/((xS * yS) - 1));
     for ( var x = 0; x < xS; x++) {
         for (var y = 0; y < 1313; y++) {
             var i =3 * ( x * 1313 + y);
@@ -79,10 +84,20 @@ function init() {
             positions[ i + 2 ] = z * Height;
 
             // colors
-
-            var cg = 0.5 + 0.5 * Math.sin(z/10 + 0.0);
-            var cb = 0.5 + 0.5 * Math.sin(z/10 + 2*Math.PI/3);
-            var cr = 0.5 + 0.5 * Math.sin(z/10 + 4*Math.PI/3);
+            
+            var abDev =  (z - avg)/stDev;
+            if (abDev > 0) {
+                var cg = findCol(abDev);
+                var cb = findCol(abDev);
+                var cr = 1;
+            } else {
+                var cg = findCol(abDev);
+                var cb = 1;
+                var cr = findCol(abDev);
+            }
+            //var cg = 0.5 + 0.5 * Math.sin(z/10 + 0.0);
+            //var cb = 0.5 + 0.5 * Math.sin(z/10 + 2*Math.PI/3);
+            //var cr = 0.5 + 0.5 * Math.sin(z/10 + 4*Math.PI/3);
             color.setRGB( cr, cg, cb );
 
             colors[ i ]     = color.r;
