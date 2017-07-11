@@ -74,9 +74,9 @@ function init() {
 
             // colors
 
-            var cr = 1;
-            var cg = Math.max(((avg - z) / avg), 0);
-            var cb = Math.max(((avg - z) / avg), 0);
+            var cr = 0.5 + 0.5 * Math.sin(z/10 + 0.0);
+            var cg = 0.5 + 0.5 * Math.sin(z/10 + 2*Math.PI/3);
+            var cb = 0.5 + 0.5 * Math.sin(z/10 + 4*Math.PI/3);
             color.setRGB( cr, cg, cb );
 
             colors[ i ]     = color.r;
