@@ -48,7 +48,7 @@ function createMatrix() {
 
 function init() {
     camera = new THREE.PerspectiveCamera( 27, window.innerWidth / window.innerHeight, 5, 3500 );
-    
+
     camera.position.z = 2750;
     const avg = total / (xS * yS);
     scene = new THREE.Scene();
@@ -74,9 +74,9 @@ function init() {
 
             // colors
 
-            var cr = 0.5 + 0.5 * Math.sin(z/10 + 0.0);
-            var cg = 0.5 + 0.5 * Math.sin(z/10 + 2*Math.PI/3);
-            var cb = 0.5 + 0.5 * Math.sin(z/10 + 4*Math.PI/3);
+            var cg = 0.5 + 0.5 * Math.sin(z/10 + 0.0);
+            var cb = 0.5 + 0.5 * Math.sin(z/10 + 2*Math.PI/3);
+            var cr = 0.5 + 0.5 * Math.sin(z/10 + 4*Math.PI/3);
             color.setRGB( cr, cg, cb );
 
             colors[ i ]     = color.r;
@@ -85,7 +85,7 @@ function init() {
 
         }
     }
-    
+
 
     geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
     geometry.addAttribute( 'color', new THREE.BufferAttribute( colors, 3 ) );
