@@ -6,7 +6,7 @@ const OrbitControls = require("three-orbitcontrols");
 const viewCrossY = document.getElementById("viewCrossY");
 var views = [
     new viewGroup(document.getElementById("viewCrossY"))
-    
+
 ];
 updateSize(views);
 
@@ -18,22 +18,9 @@ const Height = 20;
 
 createMatrix(views[0]);
 
-var loadingDiv = document.getElementById('loading');
+const loadingdiv = require('./loadingdiv.js');
 
-var numDots = 0;
-
-//Loading screen
-
-var updateLoading = setInterval(function() {
-  loadingDiv.innerHTML += '.';
-  numDots ++;
-  if(numDots == 4){
-    loadingDiv.innerHTML = "LOADING";
-    numDots = 0;
-  }
-}, 200);
-
-//end loading screen
+var loadingContainer = new loadingdiv('loading');
 
 function findCol(x) {
     return (-2 / (1 + (Math.pow(Math.E, -1 * Math.abs(x)))))+2;
@@ -132,7 +119,7 @@ function init(vG) {
                 var cr = findCol(4 * abDev);
             }
             */
-            
+
             //*
             var cg = 0.5 + 0.5 * Math.sin(z/4 + 0.0);
             var cb = 0.5 + 0.5 * Math.sin(z/4 + 2*Math.PI/3);
@@ -176,8 +163,7 @@ function init(vG) {
     //controls.dampingFactor = 0.25;
     //controls.enableZoom = true;
 
-    document.body.removeChild( document.getElementById('loading-container') );
-    clearInterval(updateLoading);
+    loadingContainer.stop();
     document.body.appendChild( vG.renderer.domElement );
 
     //
@@ -189,7 +175,7 @@ function init(vG) {
 }
 
 function onWindowResize() {
-    
+
     updateSize(views);
 
     vG.renderer.setViewport(0, 0, vG.elem.clientWidth, vG.elem.clientHeight );
@@ -209,7 +195,7 @@ function animate() {
 function render(vGL) {
 
 
-    for(var i = 0; i < vGL.length; i++) { 
+    for(var i = 0; i < vGL.length; i++) {
         vGL[i].renderer.render( vGL[i].scene, vGL[i].camera );
     }
 }
