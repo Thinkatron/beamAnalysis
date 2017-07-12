@@ -5,12 +5,11 @@ const readline = require('readline');
 const OrbitControls = require("three-orbitcontrols");
 const viewCrossY = document.getElementById("viewCrossY");
 var views = [
-    new viewGroup(document.getElementById("viewCrossY"))
+    new viewGroup(document.getElementById("viewCrossY"), "../exFiles/139_alpha0p5mmhole.txt"),
     
 ];
 updateSize(views);
 
-const file = "../exFiles/139_alpha0p5mmhole.txt";
 //const file = "exData.TXT";
 const xS = 721;
 const yS = 1313;
@@ -39,8 +38,12 @@ function findCol(x) {
     return (-2 / (1 + (Math.pow(Math.E, -1 * Math.abs(x)))))+2;
 }
 
-function viewGroup(element) {
-    this.elem = element;
+function viewGroup(elements, file) {
+    this.view2Dx = elements.x;
+    this.view2Dy = elements.y;
+    this.view2Dz = elements.z;
+    this.view3D = elements.view3D;
+    this.file = file;
     this.renderer = null;
     this.camera = null;
     this.scene = null;
@@ -54,7 +57,7 @@ function createMatrix(vG) {
     for(var i = 0; i < xS; i++){
         vG.dataMatrix[i] = new Array(yS).fill(0);
     }
-    var rl = readline.createInterface({ input: fs.createReadStream(file) });
+    var rl = readline.createInterface({ input: fs.createReadStream(vG.file) });
     rl.on('line', function(line) {
         var k = line.split("\t");
         //rl.pause();
