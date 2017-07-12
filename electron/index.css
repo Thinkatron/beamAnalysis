@@ -6,10 +6,6 @@ body {
     height: 100%;
     overflow: hidden;
 }
-canvas {
-    width: 50%; 
-    height: 100%;
-}
 .file {
     z-index: 15;
     position: fixed;
