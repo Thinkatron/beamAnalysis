@@ -5,8 +5,14 @@ const readline = require('readline');
 const OrbitControls = require("three-orbitcontrols");
 const viewCrossY = document.getElementById("viewCrossY");
 var views = [
-    new viewGroup(document.getElementById("viewCrossY"), "../exFiles/139_alpha0p5mmhole.txt"),
+    new viewGroup({
+        y: document.getElementById("view2Dx"),
+        x: document.getElementById("view2Dy"),
+        ortho: document.getElementById("viewOrtho"),
+        view3D: document.getElementById("view3D")
+    }, "../exFiles/139_alpha0p5mmhole.txt"),
     
+
 ];
 updateSize(views);
 
@@ -14,25 +20,12 @@ updateSize(views);
 const xS = 721;
 const yS = 1313;
 const Height = 20;
-
+window.addEventListener( 'resize', onWindowResize, false );
 createMatrix(views[0]);
 
-var loadingDiv = document.getElementById('loading');
+const loadingdiv = require('./loadingdiv.js');
 
-var numDots = 0;
-
-//Loading screen
-
-var updateLoading = setInterval(function() {
-  loadingDiv.innerHTML += '.';
-  numDots ++;
-  if(numDots == 4){
-    loadingDiv.innerHTML = "LOADING";
-    numDots = 0;
-  }
-}, 200);
-
-//end loading screen
+var loadingContainer = new loadingdiv('loading');
 
 function findCol(x) {
     return (-2 / (1 + (Math.pow(Math.E, -1 * Math.abs(x)))))+2;
@@ -41,15 +34,26 @@ function findCol(x) {
 function viewGroup(elements, file) {
     this.view2Dx = elements.x;
     this.view2Dy = elements.y;
-    this.view2Dz = elements.z;
+    this.viewOrtho = elements.ortho;
     this.view3D = elements.view3D;
     this.file = file;
-    this.renderer = null;
-    this.camera = null;
-    this.scene = null;
+    this.ctxOrtho = this.viewOrtho.getContext("2d", {alpha: true});
+    this.renderer2Dx = new THREE.WebGLRenderer( {canvas: this.view2Dx, antialias: true, alpha: true} );
+    this.camera2Dx = new THREE.PerspectiveCamera( 40, this.view2Dx.clientWidth / this.view2Dx.clientHeight, 5, 3500 );
+    this.scene2Dx = new THREE.Scene();
+    this.renderer2Dy = new THREE.WebGLRenderer( {canvas: this.view2Dy, antialias: true, alpha: true} );
+    this.camera2Dy = new THREE.PerspectiveCamera( 40, this.view2Dy.clientWidth / this.view2Dy.clientHeight, 5, 3500 );
+    this.scene2Dy = new THREE.Scene();
+    this.renderer3D = new THREE.WebGLRenderer( {canvas: this.view3D, antialias: true, alpha: true} );
+    this.camera3D = new THREE.PerspectiveCamera( 40, this.view3D.clientWidth / this.view3D.clientHeight, 5, 3500 );
+    this.scene3D = new THREE.Scene();
+    this.controls = new OrbitControls(this.camera3D, this.view3D);
     this.dataMatrix = null;
     this.total = 0;
     this.maxCount = 0;
+    this.resize = () => {
+        
+    }
 }
 
 function createMatrix(vG) {
@@ -80,14 +84,25 @@ function createMatrix(vG) {
 
 function updateSize(vGL) {
     for(var i = 0; i < vGL.length; i++) {
-        vGL[i].elem.width  = vGL[i].elem.clientWidth;
-        vGL[i].elem.height = vGL[i].elem.clientHeight;
-        try {
-            vGL[i].camera.aspect = vGL[i].elem.clientWidth / vGL[i].elem.clientHeight;
-            vGL[i].camera.updateProjectionMatrix();
-        } catch (e) {
-            console.log(e + "\n\n\tYou're likely okay, camera probably just isnt instanciated yet.")
-        }
+        vGL[i].view2Dx.width  = vGL[i].view2Dx.clientWidth;
+        vGL[i].view2Dx.height = vGL[i].view2Dx.clientHeight;
+        vGL[i].view2Dy.width  = vGL[i].view2Dy.clientWidth;
+        vGL[i].view2Dy.height = vGL[i].view2Dy.clientHeight;
+        vGL[i].view3D.width  = vGL[i].view3D.clientWidth;
+        vGL[i].view3D.height = vGL[i].view3D.clientHeight;
+        console.log(view2Dx.width + " x " + vGL[i].view2Dx.height);
+        console.log(view2Dy.width + " x " + vGL[i].view2Dy.height);
+        console.log(view3D.width + " x " + vGL[i].view3D.height);
+        vGL[i].camera2Dx.aspect = vGL[i].view2Dx.clientWidth / vGL[i].view2Dx.clientHeight;
+        vGL[i].camera2Dx.updateProjectionMatrix();
+        vGL[i].renderer2Dx.setViewport(0, 0, vGL[i].view2Dx.clientWidth, vGL[i].view2Dx.clientHeight );
+        vGL[i].camera2Dy.aspect = vGL[i].view2Dy.clientWidth / vGL[i].view2Dy.clientHeight;
+        vGL[i].camera2Dy.updateProjectionMatrix();
+        vGL[i].renderer2Dy.setViewport(0, 0, vGL[i].view2Dy.clientWidth, vGL[i].view2Dy.clientHeight );
+        vGL[i].camera3D.aspect = vGL[i].view3D.clientWidth / vGL[i].view3D.clientHeight;
+        vGL[i].camera3D.updateProjectionMatrix();
+        vGL[i].renderer3D.setViewport(0, 0, vGL[i].view3D.clientWidth, vGL[i].view3D.clientHeight );
+
     }
 }
 
@@ -96,11 +111,8 @@ function updateSize(vGL) {
 
 function init(vG) {
 
-    vG.camera = new THREE.PerspectiveCamera( 40, viewCrossY.clientWidth / viewCrossY.clientHeight, 5, 3500 );
 
-    vG.camera.position.z = 2750;
     const avg = vG.total / (xS * yS);
-    vG.scene = new THREE.Scene();
 
     var particles = yS * xS;
 
@@ -123,24 +135,24 @@ function init(vG) {
             positions[ i + 2 ] = z * Height;
 
             // colors
-            /*
+
             var abDev =  (z - avg)/stDev;
             if (abDev > 0) {
-                var cg = findCol(abDev);
-                var cb = findCol(abDev);
-                var cr = 1;
+                var cg2 = findCol(abDev);
+                var cb2 = findCol(abDev);
+                var cr2 = 1;
             } else {
-                var cg = findCol(4 * abDev);
-                var cb = 1;
-                var cr = findCol(4 * abDev);
+                var cg2 = findCol(4 * abDev);
+                var cb2 = 1;
+                var cr2 = findCol(4 * abDev);
             }
-            */
-            
-            //*
+
+
+
             var cg = 0.5 + 0.5 * Math.sin(z/4 + 0.0);
             var cb = 0.5 + 0.5 * Math.sin(z/4 + 2*Math.PI/3);
             var cr = 0.5 + 0.5 * Math.sin(z/4 + 4*Math.PI/3);
-            //*/
+
             color.setRGB( cr, cg, cb );
 
             colors[ i ]     = color.r;
@@ -159,43 +171,55 @@ function init(vG) {
     //
     var helper = new THREE.GridHelper(2000, 40);
     helper.rotation.x = Math.PI / 2;
-    vG.scene.add(helper)
-    var material = new THREE.MeshBasicMaterial( { /*size: 15, */vertexColors: THREE.VertexColors } );
+    var ptMaterial = new THREE.PointsMaterial( {size: 15, vertexColors: THREE.VertexColors} );
+    var points = new THREE.Points( geometry, ptMaterial );
+    var meshMaterial = new THREE.MeshBasicMaterial( {vertexColors: THREE.VertexColors} );
+    var mesh = new THREE.Mesh( geometry, meshMaterial );
+    
 
-    var points = new THREE.Mesh( geometry, material );
-    vG.scene.add( points );
+    //view2Dx
+    vG.scene2Dx.add( mesh );
+    vG.scene2Dx.add(helper)
+    vG.camera2Dx.position.z = 2750;
+    vG.scene2Dx.rotation.y = Math.PI / 2.0;
+    vG.camera2Dx.rotation.z = 3 * Math.PI / 2;
+
+    //view2Dy
+    vG.scene2Dy.add( mesh );
+    vG.scene2Dy.add(helper)
+    vG.camera2Dy.lookAt(new THREE.Vector3( 0, 0, 0 ));
+    vG.camera2Dy.position.z = 2750;
+    vG.scene2Dy.rotation.y = Math.PI / 2.0;
+    vG.camera2Dy.rotation.z = 3 * Math.PI / 2;
+
+    //view3D
+    vG.scene3D.add( points );
+    vG.scene3D.add(helper)
+    vG.camera3D.position.z = 2750;
+    vG.scene3D.rotation.y = Math.PI / 2.0;
+    vG.camera3D.rotation.z = 3 * Math.PI / 2;
+
+
+
+    vG.controls.enableDamping = true;
+    vG.controls.dampingFactor = 0.25;
+    vG.controls.enableZoom = true;
+
+    loadingContainer.stop();
 
     //
-    vG.scene.rotation.y = Math.PI / 2.0;
-    vG.camera.rotation.z = 3 * Math.PI / 2;
-    vG.renderer = new THREE.WebGLRenderer( {canvas: viewCrossY, antialias: true, alpha: true} );
-    vG.renderer.setPixelRatio( window.devicePixelRatio );
-    vG.renderer.setViewport(0, 0,  vG.elem.clientWidth, vG.elem.clientHeight );
-    vG.renderer = new THREE.WebGLRenderer( {canvas: vG.elem, antialias: true, alpha: true} );
-    vG.renderer.setPixelRatio( window.devicePixelRatio );
-    vG.renderer.setViewport(0, 0,  vG.elem.clientWidth, vG.elem.clientHeight );
-    //controls = new OrbitControls (camera, renderer.domElement);
-    //controls.enableDamping = true;
-    //controls.dampingFactor = 0.25;
-    //controls.enableZoom = true;
-
-    document.body.removeChild( document.getElementById('loading-container') );
-    clearInterval(updateLoading);
-    document.body.appendChild( vG.renderer.domElement );
 
     //
 
-    //
-
-    window.addEventListener( 'resize', onWindowResize, false );
+    
 
 }
 
 function onWindowResize() {
-    
+
     updateSize(views);
 
-    vG.renderer.setViewport(0, 0, vG.elem.clientWidth, vG.elem.clientHeight );
+
 
 }
 
@@ -204,7 +228,6 @@ function onWindowResize() {
 function animate() {
 
     requestAnimationFrame( animate );
-
     render(views);
 
 }
@@ -212,7 +235,10 @@ function animate() {
 function render(vGL) {
 
 
-    for(var i = 0; i < vGL.length; i++) { 
-        vGL[i].renderer.render( vGL[i].scene, vGL[i].camera );
+    for(var i = 0; i < vGL.length; i++) {
+        vGL[i].controls.update();
+        vGL[i].renderer3D.render( vGL[i].scene3D, vGL[i].camera3D );
+        vGL[i].renderer2Dx.render( vGL[i].scene2Dx, vGL[i].camera2Dx );
+        vGL[i].renderer2Dy.render( vGL[i].scene2Dy, vGL[i].camera2Dy );
     }
 }
