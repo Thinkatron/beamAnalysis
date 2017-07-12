@@ -16,7 +16,7 @@ const xS = 721;
 const yS = 1313;
 const Height = 20;
 
-createMatrix();
+createMatrix(views[0]);
 
 var loadingDiv = document.getElementById('loading');
 
@@ -39,8 +39,8 @@ function findCol(x) {
     return (-2 / (1 + (Math.pow(Math.E, -1 * Math.abs(x)))))+2;
 }
 
-function viewGroup(elem) {
-    this.element = elem;
+function viewGroup(element) {
+    this.elem = element;
     this.renderer = null;
     this.camera = null;
     this.scene = null;
@@ -63,8 +63,8 @@ function createMatrix(vG) {
             const y = k[2];
             const luminosity = k[3];
             vG.dataMatrix[x][y] += (luminosity >= 200);
-            vG.maxCount = Math.max(vG.dataMatrix[x][y], maxCount);
-            var center = 0.5 * maxCount;
+            vG.maxCount = Math.max(vG.dataMatrix[x][y], vG.maxCount);
+            var center = 0.5 * vG.maxCount;
             vG.total++;
         }
         //setTimeout(rl.resume, 0);
@@ -79,8 +79,12 @@ function updateSize(vGL) {
     for(var i = 0; i < vGL.length; i++) {
         vGL[i].elem.width  = vGL[i].elem.clientWidth;
         vGL[i].elem.height = vGL[i].elem.clientHeight;
-        vGL[i].camera.aspect = vGL[i].elem.clientWidth / vGL[i].elem.clientHeight;
-        vGL[i].camera.updateProjectionMatrix();
+        try {
+            vGL[i].camera.aspect = vGL[i].elem.clientWidth / vGL[i].elem.clientHeight;
+            vGL[i].camera.updateProjectionMatrix();
+        } catch (e) {
+            console.log(e + "\n\n\tYou're likely okay, camera probably just isnt instanciated yet.")
+        }
     }
 }
 
@@ -92,7 +96,7 @@ function init(vG) {
     vG.camera = new THREE.PerspectiveCamera( 40, viewCrossY.clientWidth / viewCrossY.clientHeight, 5, 3500 );
 
     vG.camera.position.z = 2750;
-    const avg = total / (xS * yS);
+    const avg = vG.total / (xS * yS);
     vG.scene = new THREE.Scene();
 
     var particles = yS * xS;
@@ -104,7 +108,6 @@ function init(vG) {
 
     var color = new THREE.Color();
 
-    var n = 1000, n2 = n / 2; // particles spread in the cube
     var sumDifSqr = 0;
     for ( var x = 0; x < xS; x++) { for (var y = 0; y < 1313; y++) {sumDifSqr += Math.pow((vG.dataMatrix[x][y] - avg), 2)}}; // Summation of absolute deviations squared
     var stDev = Math.sqrt(sumDifSqr/((xS * yS) - 1));
@@ -153,10 +156,10 @@ function init(vG) {
     //
     var helper = new THREE.GridHelper(2000, 40);
     helper.rotation.x = Math.PI / 2;
-    scene.add(helper)
+    vG.scene.add(helper)
     var material = new THREE.MeshBasicMaterial( { /*size: 15, */vertexColors: THREE.VertexColors } );
 
-    points = new THREE.Mesh( geometry, material );
+    var points = new THREE.Mesh( geometry, material );
     vG.scene.add( points );
 
     //
@@ -175,7 +178,7 @@ function init(vG) {
 
     document.body.removeChild( document.getElementById('loading-container') );
     clearInterval(updateLoading);
-    document.body.appendChild( renderer.domElement );
+    document.body.appendChild( vG.renderer.domElement );
 
     //
 
@@ -189,7 +192,7 @@ function onWindowResize() {
     
     updateSize(views);
 
-    renderer.setViewport(0, 0, vG.elem.clientWidth, vG.elem.clientHeight );
+    vG.renderer.setViewport(0, 0, vG.elem.clientWidth, vG.elem.clientHeight );
 
 }
 
@@ -199,14 +202,14 @@ function animate() {
 
     requestAnimationFrame( animate );
 
-    render();
+    render(views);
 
 }
 
-function render() {
+function render(vGL) {
 
 
-    for(i = 0; i < ; i++) { 
-        renderer.render( scene, camera );
+    for(var i = 0; i < vGL.length; i++) { 
+        vGL[i].renderer.render( vGL[i].scene, vGL[i].camera );
     }
 }
