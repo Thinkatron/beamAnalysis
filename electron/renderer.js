@@ -1,17 +1,22 @@
 'use strict';
+const {dialog} = require('electron').remote
 var BigNumber = require('bignumber.js');
 const THREE = require("./three.min.js");
 const fs = require('fs');
+const loadingdiv = require('./loadingdiv.js');
 const readline = require('readline');
 const OrbitControls = require("three-orbitcontrols");
 const viewCrossY = document.getElementById("viewCrossY");
+
+
+
 var views = [
     new viewGroup({
         y: document.getElementById("view2Dy"),
         x: document.getElementById("view2Dx"),
         ortho: document.getElementById("viewOrtho"),
         view3D: document.getElementById("view3D")
-    }, "../exFiles/139_alpha0p5mmhole.txt"),
+    }, dialog.showOpenDialog({properties: ['openFile']})[0]),
     
 
 ];
@@ -23,10 +28,6 @@ const yS = 1313;
 const Height = 20;
 window.addEventListener( 'resize', onWindowResize, false );
 createMatrix(views[0]);
-
-const loadingdiv = require('./loadingdiv.js');
-
-var loadingContainer = new loadingdiv('loading');
 
 function findCol(x) {
     return (-2 / (1 + (Math.pow(Math.E, -1 * Math.abs(x)))))+2;
@@ -41,13 +42,13 @@ function viewGroup(elements, file) {
     this.file = file;
     this.ctxOrtho = this.viewOrtho.getContext("2d", {alpha: true});
     this.renderer2Dx = new THREE.WebGLRenderer( {canvas: this.view2Dx, antialias: true, alpha: true} );
-    this.camera2Dx = new THREE.PerspectiveCamera( 40, this.view2Dx.clientWidth / this.view2Dx.clientHeight, 5, 3500 );
+    this.camera2Dx = new THREE.PerspectiveCamera( 40, this.view2Dx.clientWidth / this.view2Dx.clientHeight, 5, 4000 );
     this.scene2Dx = new THREE.Scene();
     this.renderer2Dy = new THREE.WebGLRenderer( {canvas: this.view2Dy, antialias: true, alpha: true} );
-    this.camera2Dy = new THREE.PerspectiveCamera( 25, this.view2Dy.clientWidth / this.view2Dy.clientHeight, 5, 3500 );
+    this.camera2Dy = new THREE.PerspectiveCamera( 25, this.view2Dy.clientWidth / this.view2Dy.clientHeight, 5, 4000 );
     this.scene2Dy = new THREE.Scene();
     this.renderer3D = new THREE.WebGLRenderer( {canvas: this.view3D, antialias: true, alpha: true} );
-    this.camera3D = new THREE.PerspectiveCamera( 40, this.view3D.clientWidth / this.view3D.clientHeight, 5, 3500 );
+    this.camera3D = new THREE.PerspectiveCamera( 40, this.view3D.clientWidth / this.view3D.clientHeight, 5, 4000 );
     this.scene3D = new THREE.Scene();
     this.controls = new OrbitControls(this.camera3D, this.view3D);
     this.dataMatrix = null;
@@ -55,6 +56,7 @@ function viewGroup(elements, file) {
     this.maxCount = 0;
 }
 
+    var loadingContainer = new loadingdiv('loading');
 function createMatrix(vG) {
     var tX = new BigNumber(0);
     var tY = new BigNumber(0);
@@ -74,7 +76,6 @@ function createMatrix(vG) {
             vG.maxCount = Math.max(vG.dataMatrix[x][y], vG.maxCount);
             tX = tX.plus(x);
             tY = tY.plus(y);
-            var center = 0.5 * vG.maxCount;
             vG.total++;
         }
         //setTimeout(rl.resume, 0);
@@ -89,7 +90,6 @@ function createMatrix(vG) {
 
 function updateSize(vGL) {
     for(var i = 0; i < vGL.length; i++) {
-        
         vGL[i].view2Dx.width  = window.innerWidth / 4 - 2;
         vGL[i].view2Dx.height = window.innerHeight / 4 - 2;
         vGL[i].view2Dy.width  = window.innerWidth / 4 - 2;
@@ -104,12 +104,8 @@ function updateSize(vGL) {
         vGL[i].view2Dy.style.height = vGL[i].view2Dy.height;
         vGL[i].view3D.style.width = vGL[i].view3D.width;
         vGL[i].view3D.style.height = vGL[i].view3D.height;
-        vGL[i].viewOrtho.style.width = vGL[i].viewOrtho.width;
-        vGL[i].viewOrtho.style.height = vGL[i].viewOrtho.height;
-        console.log(window.innerWidth + " x " + window.innerHeight);
-        console.log(view2Dx.width + " x " + vGL[i].view2Dx.height);
-        console.log(view2Dy.width + " x " + vGL[i].view2Dy.height);
-        console.log(view3D.width + " x " + vGL[i].view3D.height);
+        vGL[i].viewOrtho.style.maxWidth = vGL[i].viewOrtho.width;
+        vGL[i].viewOrtho.style.maxHeight = vGL[i].viewOrtho.height;
         vGL[i].camera2Dx.aspect = vGL[i].view2Dx.width / vGL[i].view2Dx.height;
         vGL[i].camera2Dy.aspect = vGL[i].view2Dy.width / vGL[i].view2Dy.height;
         vGL[i].camera3D.aspect = vGL[i].view3D.width / vGL[i].view3D.height;
@@ -217,27 +213,27 @@ function init(vG) {
     //
     var helper = new THREE.GridHelper(2000, 40, 0xFFFFFF);
     var axis = new THREE.AxisHelper(2000);
-    helper.rotation.x = Math.PI / 2;
     var ptMaterial = new THREE.PointsMaterial( {size: 15, vertexColors: THREE.VertexColors} );
     var points = new THREE.Points( geometry, ptMaterial );
-    var meshMaterial = new THREE.MeshBasicMaterial( {size: 30, vertexColors: THREE.VertexColors} );
-    var mesh = new THREE.Mesh( geometryCentered, meshMaterial );
+    var meshMaterial = new THREE.PointsMaterial( {size: 30, vertexColors: THREE.VertexColors} );
+    var mesh = new THREE.Points( geometryCentered, meshMaterial );
 
+    helper.rotation.x = Math.PI / 2;
+    helper.position.z = -1;
     //view2Dx
     vG.scene2Dx.add( mesh );
     vG.scene2Dx.add(helper);
-    vG.camera2Dx.lookAt(new THREE.Vector3( 0, 0, 0 ));
     vG.camera2Dx.position.z = 2750;
+    vG.camera2Dx.lookAt(new THREE.Vector3( 0, 0, 0 ));
     vG.scene2Dx.rotation.y = Math.PI / 2.0;
-    vG.camera2Dx.rotation.z = 3 * Math.PI / 2;
+    //vG.camera2Dx.rotation.z = 3 * Math.PI / 2;
 
     //view2Dy
     vG.scene2Dy.add( mesh );
     vG.scene2Dy.add(helper);
-    vG.camera2Dy.lookAt(new THREE.Vector3( 0, 0, 0 ));
     vG.camera2Dy.position.z = 2750;
-    vG.scene2Dy.rotation.y = Math.PI / 2.0;
-    vG.camera2Dy.rotation.z = 3 * Math.PI / 2;
+    vG.camera2Dy.lookAt(new THREE.Vector3( 0, 0, 0 ));;
+    //vG.camera2Dy.rotation.z = 3 * Math.PI / 2;
 
     //view3D
     vG.scene3D.add( points );
