@@ -6,18 +6,24 @@
     <link rel="stylesheet" href="index.css"></link>
   </head>
   <body>
-    <div style="font-family: monospace; font-weight: bold; width: 25px; left: 0; position: fixed; top: 25%">
+    <div style="font-family: monospace; font-weight: bold; width: 25px; left: 0; position: fixed; top: 34%">
       <span style="color: #ff0000">&lt;+X&gt;</span>
       <br/>
       <span style="color: #00ff00">&lt;+Y&gt;</span>
       <br/>
       <span style="color: #0000ff">&lt;+Z&gt;</span>
     </div>
-    <h1 id="loading-container"><center><div id="loading">LOADING</div></center></h1>
-    <canvas id="view2Dy" width="25%" height="25%" style="width: 25%; height: 25%; position: fixed; right: 0%; bottom: 50%;"></canvas>
-    <canvas id="view2Dx" width="25%" height="25%" style="width: 25%; height: 25%; position: fixed; right: 25%; bottom: 50%;"></canvas>
-    <canvas id="view3D" width="50%" height="75%" style="width: 50%; height: 75%; position: fixed; left: 0px; bottom: 0px;"></canvas>
-    <canvas id="viewOrtho" width="50%" height="50%" style="width: calc(50% - 2px); height: calc(50% - 2px); position: fixed; right: 0px; bottom: 0%;"></canvas>
+    <h1 id="loading-container" style="border-style: none;"><center><div id="loading">LOADING</div></center></h1>
+    <div style="width: 50%; height: 25%; position: fixed; left: 50%; top: calc(34% - 1px);">
+      <canvas id="dataView2D" width="50%" height="25%" style="width: 50%; height: 25%; position: fixed; left: calc(50% + 1px); top: calc(34% - 1px); border-style: none;"></canvas>
+      <div style="border-style: none; position: fixed; right: 5px; top: 34%; height: 25%;">
+        <ul id="dataList" style="list-style: none; columns: 2">
+          
+        </ul>
+      </div>
+    </div>
+    <canvas id="view3D" width="50%" height="66%" style="width: 50%; height: 66%; position: fixed; left: 0px; top: calc(34% - 1px);"></canvas>
+    <canvas id="viewOrtho" width="50%" height="calc(41% - 2px)%" style="width: calc(50% - 2px); height: calc(41% - 2px); position: fixed; right: 0px; bottom: 0%; border-style: none;"></canvas>
   </body>
   <script>
     // You can also require other files to run in this process

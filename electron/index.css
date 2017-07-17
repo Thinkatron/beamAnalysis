@@ -10,6 +10,16 @@ canvas {
     border-color: #505050;
     border-style: solid;
     border-width: 1px;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    -ms-interpolation-mode: nearest-neighbor;
+}
+div {
+    border-color: #505050;
+    border-style: solid;
+    border-width: 1px;
 }
 .file {
     z-index: 15;
