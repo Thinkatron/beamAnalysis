@@ -36,7 +36,10 @@ function viewGroup(elements, file) {
         this.ctx2D.arc((this.view2D.width / 2), (this.view2D.height / 2), 3, 0, 2 * Math.PI, false);
         this.ctx2D.fillStyle = '#ffffff';
         this.ctx2D.fill();
+        this.ctx2D.fillStyle = 'darkgoldenrod';
         this.ctx2D.textAlign = "center";
+        this.ctx2D.font = "1em Times";
+        this.viewOrthoDisplay
         this.ctx2D.fillText("r = " + Math.round(this.avgDist), ((this.view2D.width / 2) + ((this.view2D.width / 2 - 5) / 2)), this.view2D.height / 2 - 5, 4 * (this.view2D.width / 2) / 5);
     }
 }

@@ -55,7 +55,7 @@ function init(vG) {
     var stDev = Math.sqrt(sumDifSqr/((xS * yS) - 1));
     console.log(avg);
     console.log(stDev);
-    var maxArr = [0];
+    var zArr = [];
     for ( var x = 0; x < xS; x++) {
         for (var y = 0; y < 1313; y++) {
             var i =3 * ( x * 1313 + y);
@@ -71,6 +71,7 @@ function init(vG) {
                 var cg = 0.5 + 0.5 * Math.sin(z/4 + 0.0);
                 var cb = 0.5 + 0.5 * Math.sin(z/4 + 2*Math.PI/3);
                 var cr = 0.5 + 0.5 * Math.sin(z/4 + 4*Math.PI/3);
+                zArr[zArr.length] = z;
             } else {
                 positionsCentered[ i ]     = 0;
                 positionsCentered[ i + 1 ] = 0;
@@ -84,9 +85,6 @@ function init(vG) {
             }
             if (z == avg) {
                 avgDistArr[avgDistArr.length] = Math.sqrt(Math.pow(x - vG.center.x, 2) + Math.pow(y - vG.center.y, 2));
-            }
-            if (maxArr[maxArr.length - 1] < z) {
-                maxArr[maxArr.length] = z;
             }
 
             // colors
@@ -117,13 +115,25 @@ function init(vG) {
 
         }
     }
+    zArr.sort((a, b) => {
+        return a - b;
+    });
+    console.log(zArr);
     var avgDistTot = 0;
     for(var i = 0; i<avgDistArr.length; i++) {
         avgDistTot += avgDistArr[i];
     }
-    console.log(maxArr);
-    var statMax = maxArr[Math.floor(maxArr.length * 0.90)];
-    var max = maxArr[maxArr.length - 1];
+    var max = zArr[zArr.length - 1];
+    var statMax;
+    let cond1 = true;
+    while (cond1) {
+        if (zArr[zArr.length - 1] - zArr[zArr.length - 2] > 0.5 * stDev) {
+            zArr = zArr.slice(0, zArr.length - 1);
+        } else {
+            cond1 = false;
+        }
+    }
+    var statMax = zArr[zArr.length - 1];
     vG.avgDist = avgDistTot / avgDistArr.length;
     //console.log("Gm: " + geoMean);
     geometry.addAttribute( 'position', new THREE.BufferAttribute( positions, 3 ) );
@@ -163,7 +173,7 @@ function init(vG) {
     vG.ctxOrtho.imageSmoothingEnabled = false;
     vG.ctxOrtho.putImageData(vG.orthoDat, 0, 0)
     vG.circleFn();
-
+    vG.dataList.innerHTML = "";
     let liStDev = document.createElement("li");
     liStDev.innerHTML = "Std Dev:\t" + Math.round(stDev * 100) / 100;
     vG.dataList.appendChild(liStDev);
@@ -175,6 +185,22 @@ function init(vG) {
     let statMaxLi = document.createElement("li");
     statMaxLi.innerHTML = "Stat Max:\t" + Math.round(statMax * 100) / 100;
     vG.dataList.appendChild(statMaxLi);
+
+    let elemAreaLi = document.createElement("li");
+    statMaxLi.innerHTML = "Sensor Area:\t" + (xS * yS);
+    vG.dataList.appendChild(elemAreaLi);
+
+    let covArea = document.createElement("li");
+    statMaxLi.innerHTML = "Sensor Area:\t" + (xS * yS);
+    vG.dataList.appendChild(covArea);
+
+    let covPercent = document.createElement("li");
+    statMaxLi.innerHTML = "AreaHit:\t" + (xS * yS) + "%";
+    vG.dataList.appendChild(covPercent);
+
+    let ptCountLi = document.createElement("li");
+    statMaxLi.innerHTML = "Total Hits:\t" + (ptCount);
+    vG.dataList.appendChild(ptCountLi);
 
 
     

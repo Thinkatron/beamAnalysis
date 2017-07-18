@@ -19,7 +19,7 @@ function updateSize(vGL) {
         vGL[i].viewOrtho.style.width = (window.innerWidth / 2 - 2) + "px";
         vGL[i].viewOrtho.style.height = ((window.innerWidth / 2 - 2) * xS / yS) + "px";
         vGL[i].viewOrtho.style.bottom = (((window.innerHeight *  0.41 - 2) - ((window.innerWidth / 2 - 2) * xS / yS) ) / 2) + "px";
-
+        
         vGL[i].camera3D.aspect = vGL[i].view3D.width / vGL[i].view3D.height;
         vGL[i].renderer3D.setSize(vGL[i].view3D.width, vGL[i].view3D.height );
         vGL[i].renderer3D.setViewport(0, 0, vGL[i].view3D.width, vGL[i].view3D.height );

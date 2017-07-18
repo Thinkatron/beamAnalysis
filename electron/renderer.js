@@ -25,6 +25,12 @@ updateSize(views);
 window.addEventListener( 'resize', onWindowResize, false );
 createMatrix(views[0]);
 
+console.log("%cStd Dev:", "font-weight: bold;");
+console.log("Standard Deviation of set, taken from 75% points height; rounded to 2 decimal places.\n\n");
+console.log("%cMax:", "font-weight: bold;")
+console.log("Highest value voxel.\n\n");
+console.log("%cStat Max:", "font-weight: bold;");
+console.log("Statistical max; given from highest value with less than 1 half standard deviation from previous value.");
 
 
 

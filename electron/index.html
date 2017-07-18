@@ -6,20 +6,18 @@
     <link rel="stylesheet" href="index.css"></link>
   </head>
   <body>
-    <div style="font-family: monospace; font-weight: bold; width: 25px; left: 0; position: fixed; top: 34%">
+    <div style="border-style: none; font-family: monospace; font-weight: bold; width: 25px; left: 0; position: fixed; top: 34%">
       <span style="color: #ff0000">&lt;+X&gt;</span>
       <br/>
       <span style="color: #00ff00">&lt;+Y&gt;</span>
       <br/>
       <span style="color: #0000ff">&lt;+Z&gt;</span>
     </div>
-    <h1 id="loading-container" style="border-style: none;"><center><div id="loading">LOADING</div></center></h1>
+    <h1 id="loading-container"><center><div id="loading" style="border-style: none;">LOADING</div></center></h1>
     <div style="width: 50%; height: 25%; position: fixed; left: 50%; top: calc(34% - 1px);">
       <canvas id="dataView2D" width="50%" height="25%" style="width: 50%; height: 25%; position: fixed; left: calc(50% + 1px); top: calc(34% - 1px); border-style: none;"></canvas>
       <div style="border-style: none; position: fixed; right: 5px; top: 34%; height: 25%;">
-        <ul id="dataList" style="list-style: none; columns: 2">
-          
-        </ul>
+        <ul id="dataList" style="list-style: none; columns: 2"></ul>
       </div>
     </div>
     <canvas id="view3D" width="50%" height="66%" style="width: 50%; height: 66%; position: fixed; left: 0px; top: calc(34% - 1px);"></canvas>
